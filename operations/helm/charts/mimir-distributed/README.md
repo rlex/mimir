@@ -4,7 +4,7 @@ Helm chart for deploying [Grafana Mimir](https://grafana.com/docs/mimir/v2.1.x/)
 
 # mimir-distributed
 
-![Version: 2.1.0-beta.7](https://img.shields.io/badge/Version-2.1.0--beta.7-informational?style=flat-square) ![AppVersion: 2.1.0](https://img.shields.io/badge/AppVersion-2.1.0-informational?style=flat-square)
+![Version: 2.2.0-weekly.189](https://img.shields.io/badge/Version-2.2.0--weekly.189-informational?style=flat-square) ![AppVersion: 2.1.0](https://img.shields.io/badge/AppVersion-2.1.0-informational?style=flat-square)
 
 Grafana Mimir
 
@@ -185,9 +185,4 @@ helm install test ./ --values ./ci/test-values.yaml
 
 # Contributing/Releasing
 
-All changes require a bump to the chart version, as this enforced by CI. All changes to the chart itself should also have a corresponding CHANGELOG entry.
-
-When making a change and organizing a release, first ensure your changes are encapuslated in a meaningful commit.
-In a separate commit, increase the chart version in the `Chart.yaml` file and add a CHANGELOG entry in the `CHANGELOG.md` file under the new version.
-
-Finally, push your changes and open up a Pull Request with the prefix `[mimir-distributed]`.
+Please see the dedicated "[Contributing to Grafana Mimir helm chart](https://github.com/grafana/mimir/tree/main/docs/internal/contributing/contributing-to-helm-chart.md)" page.

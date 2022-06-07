@@ -44,6 +44,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - "-target=tokengen"
+            - "-config.expand-env=true"
             - "-config.file=/etc/mimir/mimir.yaml"
             {{- range $key, $value := .Values.tokengenJob.extraArgs }}
             - "-{{ $key }}={{ $value }}"
@@ -57,8 +58,18 @@ spec:
             - name: license
               mountPath: /license
           env:
-            {{- if .Values.tokengenJob.env }}
-              {{ toYaml .Values.tokengenJob.env | nindent 12 }}
+            {{- with .Values.global.extraEnv }}
+              {{ toYaml . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.tokengenJob.env }}
+              {{ toYaml . | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- with .Values.global.extraEnvFrom }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.tokengenJob.extraEnvFrom }}
+              {{- toYaml . | nindent 12 }}
             {{- end }}
       restartPolicy: OnFailure
       volumes:

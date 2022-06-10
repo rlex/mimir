@@ -75,9 +75,9 @@ memcached:
   enabled: true
   replicaCount: 32
 
-memcached-queries:
+memcached-index-queries:
   enabled: true
-  replicaCount: 10
+  replicas: 10
 
 memcached-metadata:
   enabled: true

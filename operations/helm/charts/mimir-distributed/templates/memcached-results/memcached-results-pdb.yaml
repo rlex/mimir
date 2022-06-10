@@ -1,5 +1,5 @@
-{{- if .Values.memcached_results.enabled -}}
-{{- if .Values.memcached_results.podDisruptionBudget -}}
+{{- if (index .Values "memcached-results").enabled -}}
+{{- if (index .Values "memcached-results").podDisruptionBudget -}}
 apiVersion: {{ include "mimir.podDisruptionBudget.apiVersion" . }}
 kind: PodDisruptionBudget
 metadata:
@@ -10,6 +10,6 @@ spec:
   selector:
     matchLabels:
       {{- include "mimir.selectorLabels" (dict "ctx" . "component" "memcached-results") | nindent 6 }}
-{{ toYaml .Values.memcached_results.podDisruptionBudget | indent 2 }}
+{{ toYaml (index .Values "memcached-results").podDisruptionBudget | indent 2 }}
 {{- end -}}
 {{- end -}}

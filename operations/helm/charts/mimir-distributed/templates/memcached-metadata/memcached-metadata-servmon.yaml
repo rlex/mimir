@@ -1,4 +1,4 @@
-{{- if .Values.memcached_metadata.enabled -}}
+{{- if (index .Values "memcached-metadata").enabled -}}
 {{- with .Values.serviceMonitor }}
 {{- if .enabled }}
 apiVersion: monitoring.coreos.com/v1

@@ -94,12 +94,12 @@ mimir:
     frontend:
       log_queries_longer_than: 10s
       align_queries_with_step: true
-      {{- if .Values.memcached_results.enabled }}
+      {{- if (index .Values "memcached-results").enabled }}
       results_cache:
         backend: memcached
         memcached:
-          addresses: dns+{{ .Release.Name }}-memcached-results-headless.{{ .Release.Namespace }}.svc:{{ .Values.memcached_results.port }}
-          max_item_size: {{ mul .Values.memcached_results.maxItemMemory 1024 1024 }}
+          addresses: dns+{{ .Release.Name }}-memcached-results-headless.{{ .Release.Namespace }}.svc:{{ (index .Values "memcached-results").port }}
+          max_item_size: {{ mul (index .Values "memcached-results").maxItemMemory 1024 1024 }}
       cache_results: true
       {{- end }}
 
@@ -141,19 +141,19 @@ mimir:
             max_item_size: {{ mul .Values.memcached.maxItemMemory 1024 1024 }}
             timeout: 450ms
         {{- end }}
-        {{- if .Values.memcached_metadata.enabled }}
+        {{- if (index .Values "memcached-metadata").enabled }}
         metadata_cache:
           backend: memcached
           memcached:
-            addresses: dns+{{ .Release.Name }}-memcached-metadata-headless.{{ .Release.Namespace }}.svc:{{ .Values.memcached_metadata.port }}
-            max_item_size: {{ mul .Values.memcached_metadata.maxItemMemory 1024 1024 }}
+            addresses: dns+{{ .Release.Name }}-memcached-metadata-headless.{{ .Release.Namespace }}.svc:{{ (index .Values "memcached-metadata").port }}
+            max_item_size: {{ mul (index .Values "memcached-metadata").maxItemMemory 1024 1024 }}
         {{- end }}
-        {{- if .Values.memcached_index_queries.enabled }}
+        {{- if (index .Values "memcached-index-queries").enabled }}
         index_cache:
           backend: memcached
           memcached:
-            addresses: dns+{{ .Release.Name }}-memcached-index-queries-headless.{{ .Release.Namespace }}.svc:{{ .Values.memcached_index_queries.port }}
-            max_item_size: {{ mul .Values.memcached_index_queries.maxItemMemory 1024 1024 }}
+            addresses: dns+{{ .Release.Name }}-memcached-index-queries-headless.{{ .Release.Namespace }}.svc:{{ (index .Values "memcached-index-queries").port }}
+            max_item_size: {{ mul (index .Values "memcached-index-queries").maxItemMemory 1024 1024 }}
         {{- end }}
       {{- if .Values.minio.enabled }}
       s3:
@@ -1075,7 +1075,7 @@ memcached:
       - --memcached.address=localhost:11211
       - --web.listen-address=0.0.0.0:9150
 
-memcached_index_queries:
+memcached-index-queries:
   # -- Specifies whether memcached-index-queries should be enabled
   enabled: false
 
@@ -1161,7 +1161,7 @@ memcached_index_queries:
       - --memcached.address=localhost:11211
       - --web.listen-address=0.0.0.0:9150
 
-memcached_metadata:
+memcached-metadata:
   # -- Specifies whether memcached-metadata should be enabled
   enabled: false
 
@@ -1247,7 +1247,7 @@ memcached_metadata:
       - --memcached.address=localhost:11211
       - --web.listen-address=0.0.0.0:9150
 
-memcached_results:
+memcached-results:
   # -- Specifies whether memcached-results should be enabled
   enabled: false
 

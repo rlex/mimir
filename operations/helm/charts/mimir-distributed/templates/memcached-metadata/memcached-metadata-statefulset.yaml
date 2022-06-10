@@ -1,4 +1,4 @@
-{{- if .Values.memcached_metadata.enabled -}}
+{{- if (index .Values "memcached-metadata").enabled -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -6,38 +6,38 @@ metadata:
   labels:
     {{- include "mimir.labels" (dict "ctx" . "component" "memcached-metadata") | nindent 4 }}
   annotations:
-    {{- toYaml .Values.memcached_metadata.annotations | nindent 4 }}
+    {{- toYaml (index .Values "memcached-metadata").annotations | nindent 4 }}
 spec:
-  podManagementPolicy: {{ .Values.memcached_metadata.podManagementPolicy }}
-  replicas: {{ .Values.memcached.replicas }}
+  podManagementPolicy: {{ (index .Values "memcached-metadata").podManagementPolicy }}
+  replicas: {{ (index .Values "memcached-metadata").replicas }}
   selector:
     matchLabels:
       {{- include "mimir.selectorLabels" (dict "ctx" . "component" "memcached-metadata") | nindent 6 }}
   updateStrategy:
-    {{- toYaml .Values.memcached_metadata.statefulStrategy | nindent 4 }}
+    {{- toYaml (index .Values "memcached-metadata").statefulStrategy | nindent 4 }}
   serviceName: {{ template "mimir.fullname" . }}-memcached-metadata
 
   template:
     metadata:
       labels:
         {{- include "mimir.podLabels" (dict "ctx" . "component" "memcached-metadata") | nindent 8 }}
-        {{- with .Values.memcached_metadata.podLabels }}
+        {{- with (index .Values "memcached-metadata").podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       annotations:
-        {{- with .Values.memcached_metadata.podAnnotations }}
+        {{- with (index .Values "memcached-metadata").podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
 
     spec:
       serviceAccountName: {{ template "mimir.serviceAccountName" . }}
-      {{- if .Values.memcached_metadata.priorityClassName }}
-      priorityClassName: {{ .Values.memcached_metadata.priorityClassName }}
+      {{- if (index .Values "memcached-metadata").priorityClassName }}
+      priorityClassName: {{ (index .Values "memcached-metadata").priorityClassName }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.memcached_metadata.securityContext | nindent 8 }}
+        {{- toYaml (index .Values "memcached-metadata").securityContext | nindent 8 }}
       initContainers:
-        {{- toYaml .Values.memcached_metadata.initContainers | nindent 8 }}
+        {{- toYaml (index .Values "memcached-metadata").initContainers | nindent 8 }}
       {{- if .Values.image.pullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.pullSecrets }}
@@ -45,43 +45,43 @@ spec:
       {{- end }}
       {{- end }}
       nodeSelector:
-        {{- toYaml .Values.memcached_metadata.nodeSelector | nindent 8 }}
+        {{- toYaml (index .Values "memcached-metadata").nodeSelector | nindent 8 }}
       affinity:
-        {{- toYaml .Values.memcached_metadata.affinity | nindent 8 }}
+        {{- toYaml (index .Values "memcached-metadata").affinity | nindent 8 }}
       tolerations:
-        {{- toYaml .Values.memcached_metadata.tolerations | nindent 8 }}
-      terminationGracePeriodSeconds: {{ .Values.memcached_metadata.terminationGracePeriodSeconds }}
+        {{- toYaml (index .Values "memcached-metadata").tolerations | nindent 8 }}
+      terminationGracePeriodSeconds: {{ (index .Values "memcached-metadata").terminationGracePeriodSeconds }}
       containers:
-        {{- if .Values.memcached.extraContainers }}
-        {{ toYaml .Values.memcached_metadata.extraContainers | nindent 8 }}
+        {{- if (index .Values "memcached-metadata").extraContainers }}
+        {{ toYaml (index .Values "memcached-metadata").extraContainers | nindent 8 }}
         {{- end }}
         - name: memcached
-          image: {{ .Values.memcached_metadata.image.repository}}:{{ .Values.memcached_metadata.image.tag}}
-          imagePullPolicy: {{ .Values.memcached_metadata.image.pullPolicy }}
+          image: {{ (index .Values "memcached-metadata").image.repository}}:{{ (index .Values "memcached-metadata").image.tag}}
+          imagePullPolicy: {{ (index .Values "memcached-metadata").image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.memcached_metadata.port }}
+            - containerPort: {{ (index .Values "memcached-metadata").port }}
               name: client
           args:
-            - -m {{ .Values.memcached_metadata.allocatedMemory }}
+            - -m {{ (index .Values "memcached-metadata").allocatedMemory }}
             - -o
             - modern
-            - -I {{ .Values.memcached_metadata.maxItemMemory }}m
+            - -I {{ (index .Values "memcached-metadata").maxItemMemory }}m
             - -c 16384
             - -v
-            - -u {{ .Values.memcached_metadata.port }}
-            {{- range $key, $value := .Values.memcached_metadata.extraArgs }}
+            - -u {{ (index .Values "memcached-metadata").port }}
+            {{- range $key, $value := (index .Values "memcached-metadata").extraArgs }}
             - "-{{ $key }} {{ $value }}"
             {{- end }}
 
-      {{- if .Values.memcached_metadata.metrics.enabled }}
+      {{- if (index .Values "memcached-metadata").metrics.enabled }}
         - name: exporter
-          image: {{ .Values.memcached_metadata.metrics.image.repository}}:{{ .Values.memcached_metadata.metrics.image.tag }}
-          imagePullPolicy: {{ .Values.memcached_metadata.metrics.image.pullPolicy }}
+          image: {{ (index .Values "memcached-metadata").metrics.image.repository}}:{{ (index .Values "memcached-metadata").metrics.image.tag }}
+          imagePullPolicy: {{ (index .Values "memcached-metadata").metrics.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.memcached_metadata.metrics.containerPort }}
+            - containerPort: {{ (index .Values "memcached-metadata").metrics.containerPort }}
               name: http-metrics
           args:
-            {{- range $value := .Values.memcached_metadata.metrics.args }}
+            {{- range $value := (index .Values "memcached-metadata").metrics.args }}
             - {{ $value }}
             {{- end }}
       {{- end }}

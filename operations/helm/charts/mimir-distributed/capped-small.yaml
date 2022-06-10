@@ -75,14 +75,14 @@ memcached:
   enabled: true
   replicas: 2
 
-memcached_index_queries:
+memcached-index-queries:
   enabled: true
   replicas: 3
 
-memcached_metadata:
+memcached-metadata:
   enabled: true
 
-memcached_results:
+memcached-results:
   enabled: true
 
 minio:

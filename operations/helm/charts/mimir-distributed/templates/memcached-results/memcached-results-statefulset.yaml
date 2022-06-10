@@ -1,4 +1,4 @@
-{{- if .Values.memcached_results.enabled -}}
+{{- if (index .Values "memcached-results").enabled -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -6,38 +6,38 @@ metadata:
   labels:
     {{- include "mimir.labels" (dict "ctx" . "component" "memcached-results") | nindent 4 }}
   annotations:
-    {{- toYaml .Values.memcached_results.annotations | nindent 4 }}
+    {{- toYaml (index .Values "memcached-results").annotations | nindent 4 }}
 spec:
-  podManagementPolicy: {{ .Values.memcached_results.podManagementPolicy }}
-  replicas: {{ .Values.memcached_results.replicas }}
+  podManagementPolicy: {{ (index .Values "memcached-results").podManagementPolicy }}
+  replicas: {{ (index .Values "memcached-results").replicas }}
   selector:
     matchLabels:
       {{- include "mimir.selectorLabels" (dict "ctx" . "component" "memcached-results") | nindent 6 }}
   updateStrategy:
-    {{- toYaml .Values.memcached_results.statefulStrategy | nindent 4 }}
+    {{- toYaml (index .Values "memcached-results").statefulStrategy | nindent 4 }}
   serviceName: {{ template "mimir.fullname" . }}-memcached-results
 
   template:
     metadata:
       labels:
         {{- include "mimir.podLabels" (dict "ctx" . "component" "memcached-results") | nindent 8 }}
-        {{- with .Values.memcached_results.podLabels }}
+        {{- with (index .Values "memcached-results").podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       annotations:
-        {{- with .Values.memcached_results.podAnnotations }}
+        {{- with (index .Values "memcached-results").podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
 
     spec:
       serviceAccountName: {{ template "mimir.serviceAccountName" . }}
-      {{- if .Values.memcached_results.priorityClassName }}
-      priorityClassName: {{ .Values.memcached_results.priorityClassName }}
+      {{- if (index .Values "memcached-results").priorityClassName }}
+      priorityClassName: {{ (index .Values "memcached-results").priorityClassName }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.memcached_results.securityContext | nindent 8 }}
+        {{- toYaml (index .Values "memcached-results").securityContext | nindent 8 }}
       initContainers:
-        {{- toYaml .Values.memcached_results.initContainers | nindent 8 }}
+        {{- toYaml (index .Values "memcached-results").initContainers | nindent 8 }}
       {{- if .Values.image.pullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.pullSecrets }}
@@ -45,43 +45,43 @@ spec:
       {{- end }}
       {{- end }}
       nodeSelector:
-        {{- toYaml .Values.memcached_results.nodeSelector | nindent 8 }}
+        {{- toYaml (index .Values "memcached-results").nodeSelector | nindent 8 }}
       affinity:
-        {{- toYaml .Values.memcached_results.affinity | nindent 8 }}
+        {{- toYaml (index .Values "memcached-results").affinity | nindent 8 }}
       tolerations:
-        {{- toYaml .Values.memcached_results.tolerations | nindent 8 }}
-      terminationGracePeriodSeconds: {{ .Values.memcached_results.terminationGracePeriodSeconds }}
+        {{- toYaml (index .Values "memcached-results").tolerations | nindent 8 }}
+      terminationGracePeriodSeconds: {{ (index .Values "memcached-results").terminationGracePeriodSeconds }}
       containers:
-        {{- if .Values.memcached_results.extraContainers }}
-        {{ toYaml .Values.memcached_results.extraContainers | nindent 8 }}
+        {{- if (index .Values "memcached-results").extraContainers }}
+        {{ toYaml (index .Values "memcached-results").extraContainers | nindent 8 }}
         {{- end }}
         - name: memcached
-          image: {{ .Values.memcached_results.image.repository}}:{{ .Values.memcached_results.image.tag}}
-          imagePullPolicy: {{ .Values.memcached_results.image.pullPolicy }}
+          image: {{ (index .Values "memcached-results").image.repository}}:{{ (index .Values "memcached-results").image.tag}}
+          imagePullPolicy: {{ (index .Values "memcached-results").image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.memcached_results.port }}
+            - containerPort: {{ (index .Values "memcached-results").port }}
               name: client
           args:
-            - -m {{ .Values.memcached_results.allocatedMemory }}
+            - -m {{ (index .Values "memcached-results").allocatedMemory }}
             - -o
             - modern
-            - -I {{ .Values.memcached_results.maxItemMemory }}m
+            - -I {{ (index .Values "memcached-results").maxItemMemory }}m
             - -c 16384
             - -v
-            - -u {{ .Values.memcached_results.port }}
-            {{- range $key, $value := .Values.memcached_results.extraArgs }}
+            - -u {{ (index .Values "memcached-results").port }}
+            {{- range $key, $value := (index .Values "memcached-results").extraArgs }}
             - "-{{ $key }} {{ $value }}"
             {{- end }}
 
-      {{- if .Values.memcached_results.metrics.enabled }}
+      {{- if (index .Values "memcached-results").metrics.enabled }}
         - name: exporter
-          image: {{ .Values.memcached_results.metrics.image.repository}}:{{ .Values.memcached_results.metrics.image.tag }}
-          imagePullPolicy: {{ .Values.memcached_results.metrics.image.pullPolicy }}
+          image: {{ (index .Values "memcached-results").metrics.image.repository}}:{{ (index .Values "memcached-results").metrics.image.tag }}
+          imagePullPolicy: {{ (index .Values "memcached-results").metrics.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.memcached_results.metrics.containerPort }}
+            - containerPort: {{ (index .Values "memcached-results").metrics.containerPort }}
               name: http-metrics
           args:
-            {{- range $value := .Values.memcached_results.metrics.args }}
+            {{- range $value := (index .Values "memcached-results").metrics.args }}
             - {{ $value }}
             {{- end }}
       {{- end }}

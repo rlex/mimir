@@ -1,4 +1,4 @@
-{{- if .Values.memcached_index_queries.enabled -}}
+{{- if (index .Values "memcached-index-queries").enabled -}}
 {{- with .Values.serviceMonitor }}
 {{- if .enabled }}
 apiVersion: monitoring.coreos.com/v1

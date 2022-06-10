@@ -73,14 +73,14 @@ memcached:
   enabled: true
   replicas: 32
 
-memcached_index_queries:
+memcached-index-queries:
   enabled: true
   replicas: 10
 
-memcached_metadata:
+memcached-metadata:
   enabled: true
 
-memcached_results:
+memcached-results:
   enabled: true
   replicas: 4
 

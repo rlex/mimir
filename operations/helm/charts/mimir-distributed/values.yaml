@@ -991,7 +991,7 @@ compactor:
 
 memcached:
   # -- Specifies whether memcached should be enabled
-  enabled: true
+  enabled: false
 
   # -- Total number of memcached replicas
   replicas: 1
@@ -1078,7 +1078,7 @@ memcached:
 
 memcached_index_queries:
   # -- Specifies whether memcached-index-queries should be enabled
-  enabled: true
+  enabled: false
 
   # -- Total number of memcached-index-queries replicas
   replicas: 1
@@ -1165,7 +1165,7 @@ memcached_index_queries:
 
 memcached_metadata:
   # -- Specifies whether memcached-metadata should be enabled
-  enabled: true
+  enabled: false
 
   # -- Total number of memcached-metadata replicas
   replicas: 1
@@ -1252,7 +1252,7 @@ memcached_metadata:
 
 memcached_results:
   # -- Specifies whether memcached-results should be enabled
-  enabled: true
+  enabled: false
 
   # -- Total number of memcached-results replicas
   replicas: 1

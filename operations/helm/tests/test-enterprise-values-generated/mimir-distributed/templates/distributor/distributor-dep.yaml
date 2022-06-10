@@ -37,7 +37,7 @@ spec:
         app.kubernetes.io/component: distributor
         app.kubernetes.io/part-of: memberlist
       annotations:
-        checksum/config: 947b632f7fba25ae0b38840e80adc7188497dc4078781991db094b497b28e533
+        checksum/config: 20297fef45efa773cd872a3e65ada08c59029003e83d3b1eace4d87bbf72ce99
     spec:
       serviceAccountName: test-enterprise-values-mimir
       securityContext:

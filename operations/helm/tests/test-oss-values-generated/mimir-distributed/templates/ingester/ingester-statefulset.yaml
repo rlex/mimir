@@ -36,7 +36,7 @@ spec:
         app.kubernetes.io/component: ingester
         app.kubernetes.io/part-of: memberlist
       annotations:
-        checksum/config: fa55e57425749b4770b3282a566c10b77e9b9941b7a7d88dbc93aa51a1886492
+        checksum/config: 7b9ed84df22bf324205968cf49b0d824eb15e1748888719ffc3bab3f17d5e2e4
     spec:
       serviceAccountName: test-oss-values-mimir
       securityContext:

@@ -22,10 +22,6 @@ spec:
       port: 11211
       targetPort: 11211
     
-    - name: exporter-http-metrics
-      port: 9150
-      targetPort: 9150
-    
   selector:
     app.kubernetes.io/name: mimir
     app.kubernetes.io/instance: test-oss-values

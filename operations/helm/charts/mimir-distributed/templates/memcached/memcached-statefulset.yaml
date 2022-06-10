@@ -73,15 +73,16 @@ spec:
             - "-{{ $key }} {{ $value }}"
             {{- end }}
 
-      {{- if .Values.memcached.metricsEnabled }}
+      {{- if .Values.memcached.metrics.enabled }}
         - name: exporter
-          image: prom/memcached-exporter:v0.6.0
-          imagePullPolicy: IfNotPresent
+          image: {{ .Values.memcached.metrics.image.repository}}:{{ .Values.memcached.metrics.image.tag }}
+          imagePullPolicy: {{ .Values.memcached.metrics.image.pullPolicy }}
           ports:
-            - containerPort: 9150
+            - containerPort: {{ .Values.memcached.metrics.containerPort }}
               name: http-metrics
           args:
-            - "--memcached.address=localhost:{{ .Values.memcached.port }}"
-            - "--web.listen-address=0.0.0.0:9150"
+            {{- range $value := .Values.memcached.metrics.args }}
+            - {{ $value }}
+            {{- end }}
       {{- end }}
 {{- end -}}

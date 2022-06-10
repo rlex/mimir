@@ -65,7 +65,7 @@ spec:
             - -m {{ .Values.memcached_results.allocatedMemory }}
             - -o
             - modern
-            - -I 1m
+            - -I {{ .Values.memcached_results.maxItemMemory }}m
             - -c 16384
             - -v
             - -u {{ .Values.memcached_results.port }}

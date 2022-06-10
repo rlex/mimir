@@ -99,7 +99,7 @@ mimir:
         backend: memcached
         memcached:
           addresses: dns+{{ .Release.Name }}-memcached-results-headless.{{ .Release.Namespace }}.svc:{{ .Values.memcached_results.port }}
-          max_item_size: {{ .Values.memcached_results.maxItemMemory }}
+          max_item_size: {{ mul .Values.memcached_results.maxItemMemory 1024 1024 }}
       cache_results: true
       {{- end }}
 
@@ -138,7 +138,7 @@ mimir:
           backend: memcached
           memcached:
             addresses: dns+{{ .Release.Name }}-memcached-headless.{{ .Release.Namespace }}.svc:{{ .Values.memcached.port }}
-            max_item_size: {{ .Values.memcached.maxItemMemory }}
+            max_item_size: {{ mul .Values.memcached.maxItemMemory 1024 1024 }}
             timeout: 450ms
         {{- end }}
         {{- if .Values.memcached_metadata.enabled }}
@@ -146,14 +146,14 @@ mimir:
           backend: memcached
           memcached:
             addresses: dns+{{ .Release.Name }}-memcached-metadata-headless.{{ .Release.Namespace }}.svc:{{ .Values.memcached_metadata.port }}
-            max_item_size: {{ .Values.memcached_metadata.maxItemMemory }}
+            max_item_size: {{ mul .Values.memcached_metadata.maxItemMemory 1024 1024 }}
         {{- end }}
         {{- if .Values.memcached_index_queries.enabled }}
         index_cache:
           backend: memcached
           memcached:
             addresses: dns+{{ .Release.Name }}-memcached-index-queries-headless.{{ .Release.Namespace }}.svc:{{ .Values.memcached_index_queries.port }}
-            max_item_size: {{ .Values.memcached_index_queries.maxItemMemory }}
+            max_item_size: {{ mul .Values.memcached_index_queries.maxItemMemory 1024 1024 }}
         {{- end }}
       {{- if .Values.minio.enabled }}
       s3:
@@ -1008,9 +1008,8 @@ memcached:
   # -- Amount of memory allocated to memcached for object storage (in MB).
   allocatedMemory: 8192
 
-  # maxItemMemory is in bytes. Should match memcached -I flag (which is in MB)
-  # It is a string to avoid https://github.com/helm/helm/issues/1707.
-  maxItemMemory: '1048576'  # (* 1 (* 1024 1024))
+  # -- Maximum item memory for memcached (in MB).
+  maxItemMemory: 1
 
   # -- Extra init containers for memcached pods
   initContainers: []
@@ -1095,9 +1094,8 @@ memcached_index_queries:
   # -- Amount of memory allocated to memcached-index-queries for object storage (in MB).
   allocatedMemory: 2048
 
-  # maxItemMemory is in bytes. Should match memcached-index-queries -I flag (which is in MB)
-  # It is a string to avoid https://github.com/helm/helm/issues/1707.
-  maxItemMemory: '15728640'  # (* 15 (* 1024 1024))
+  # -- Maximum item memcached-index-queries for memcached (in MB).
+  maxItemMemory: 15
 
   # -- Extra init containers for memcached-index-queries pods
   initContainers: []
@@ -1182,9 +1180,8 @@ memcached_metadata:
   # -- Amount of memory allocated to memcached-metadata for object storage (in MB).
   allocatedMemory: 512
 
-  # maxItemMemory is in bytes. Should match memcached-metadata -I flag (which is in MB)
-  # It is a string to avoid https://github.com/helm/helm/issues/1707.
-  maxItemMemory: '1048576'  # (* 1 (* 1024 1024))
+  # -- Maximum item memcached-metadata for memcached (in MB).
+  maxItemMemory: 1
 
   # -- Extra init containers for memcached-metadata pods
   initContainers: []
@@ -1269,9 +1266,8 @@ memcached_results:
   # -- Amount of memory allocated to memcached-results for object storage (in MB).
   allocatedMemory: 512
 
-  # maxItemMemory is in bytes. Should match memcached-results -I flag (which is in MB)
-  # It is a string to avoid https://github.com/helm/helm/issues/1707.
-  maxItemMemory: '1048576'  # (* 1 (* 1024 1024))
+  # -- Maximum item memcached-results for memcached (in MB).
+  maxItemMemory: 1
 
   # -- Extra init containers for memcached-results pods
   initContainers: []

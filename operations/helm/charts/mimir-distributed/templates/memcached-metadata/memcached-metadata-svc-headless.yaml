@@ -1,28 +1,30 @@
-{{- if (index .Values "memcached-metadata").enabled -}}
+{{ with (index .Values "memcached-metadata") }}
+{{- if .enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "mimir.resourceName" (dict "ctx" . "component" "memcached-metadata") }}-headless
+  name: {{ include "mimir.resourceName" (dict "ctx" $ "component" "memcached-metadata") }}-headless
   labels:
-    {{- include "mimir.labels" (dict "ctx" . "component" "memcached-metadata") | nindent 4 }}
+    {{- include "mimir.labels" (dict "ctx" $ "component" "memcached-metadata") | nindent 4 }}
     prometheus.io/service-monitor: "false"
-    {{- with (index .Values "memcached-metadata").service.labels }}
+    {{- with .service.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
-    {{- toYaml (index .Values "memcached-metadata").service.annotations | nindent 4 }}
+    {{- toYaml .service.annotations | nindent 4 }}
 spec:
   type: ClusterIP
   clusterIP: None
   ports:
     - name: memcached-client
-      port: {{ (index .Values "memcached-metadata").port }}
-      targetPort: {{ (index .Values "memcached-metadata").port }}
-    {{ if (index .Values "memcached-metadata").metrics.enabled }}
+      port: {{ .port }}
+      targetPort: {{ .port }}
+    {{ if .metrics.enabled }}
     - name: exporter-http-metrics
-      port: {{ (index .Values "memcached-metadata").metrics.containerPort }}
-      targetPort: {{ (index .Values "memcached-metadata").metrics.containerPort }}
+      port: {{ .metrics.containerPort }}
+      targetPort: {{ .metrics.containerPort }}
     {{ end }}
   selector:
-    {{- include "mimir.selectorLabels" (dict "ctx" . "component" "memcached-metadata") | nindent 4 }}
+    {{- include "mimir.selectorLabels" (dict "ctx" $ "component" "memcached-metadata") | nindent 4 }}
+{{- end -}}
 {{- end -}}

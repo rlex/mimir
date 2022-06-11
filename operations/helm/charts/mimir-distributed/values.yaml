@@ -1053,7 +1053,7 @@ memcached:
       memory: 9830Mi
     requests:
       cpu: 500m
-      # memory requests should be exceeded memcached -m flag
+      # memory requests should exceeded allocatedMemory
       memory: 9830Mi  # (floor (* 1.2 8192))
 
   # -- Service annotations and labels

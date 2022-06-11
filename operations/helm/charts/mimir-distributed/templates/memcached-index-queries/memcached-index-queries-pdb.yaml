@@ -1,17 +1,1 @@
-{{ with (index .Values "memcached-index-queries") }}
-{{- if .enabled -}}
-{{- if .podDisruptionBudget -}}
-apiVersion: {{ include "mimir.podDisruptionBudget.apiVersion" . }}
-kind: PodDisruptionBudget
-metadata:
-  name: {{ include "mimir.resourceName" (dict "ctx" $ "component" "memcached-index-queries") }}
-  labels:
-    {{- include "mimir.labels" (dict "ctx" $ "component" "memcached-index-queries") | nindent 4 }}
-spec:
-  selector:
-    matchLabels:
-      {{- include "mimir.selectorLabels" (dict "ctx" $ "component" "memcached-index-queries") | nindent 6 }}
-{{ toYaml .podDisruptionBudget | indent 2 }}
-{{- end -}}
-{{- end -}}
-{{- end -}}
+{{- include "mimir.memcached.podDisruptionBudget" (dict "ctx" $ "component" "memcached-index-queries" ) }}

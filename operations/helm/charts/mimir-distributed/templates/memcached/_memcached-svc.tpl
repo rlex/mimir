@@ -1,11 +1,15 @@
-{{ with (index .Values "memcached") }}
+{{/*
+memcached Service
+*/}}
+{{- define "mimir.memcached.service" -}}
+{{ with (index $.ctx.Values $.component) }}
 {{- if .enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "mimir.resourceName" (dict "ctx" $ "component" "memcached") }}-headless
+  name: {{ include "mimir.resourceName" (dict "ctx" $.ctx "component" $.component) }}-headless
   labels:
-    {{- include "mimir.labels" (dict "ctx" $ "component" "memcached") | nindent 4 }}
+    {{- include "mimir.labels" (dict "ctx" $.ctx "component" $.component) | nindent 4 }}
     prometheus.io/service-monitor: "false"
     {{- with .service.labels }}
     {{- toYaml . | nindent 4 }}
@@ -25,6 +29,7 @@ spec:
       targetPort: {{ .metrics.containerPort }}
     {{ end }}
   selector:
-    {{- include "mimir.selectorLabels" (dict "ctx" $ "component" "memcached") | nindent 4 }}
+    {{- include "mimir.selectorLabels" (dict "ctx" $.ctx "component" $.component) | nindent 4 }}
+{{- end -}}
 {{- end -}}
 {{- end -}}

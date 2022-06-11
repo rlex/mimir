@@ -71,7 +71,7 @@ ingester:
                   - ingester
           topologyKey: 'kubernetes.io/hostname'
 
-memcached:
+memcached-chunks:
   enabled: true
   replicas: 2
 

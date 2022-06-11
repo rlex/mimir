@@ -1,11 +1,15 @@
-{{ with (index .Values "memcached") }}
+{{/*
+memcached StatefulSet
+*/}}
+{{- define "mimir.memcached.statefulSet" -}}
+{{ with (index $.ctx.Values $.component) }}
 {{- if .enabled -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "mimir.resourceName" (dict "ctx" $ "component" "memcached") }}
+  name: {{ include "mimir.resourceName" (dict "ctx" $.ctx "component" $.component) }}
   labels:
-    {{- include "mimir.labels" (dict "ctx" $ "component" "memcached") | nindent 4 }}
+    {{- include "mimir.labels" (dict "ctx" $.ctx "component" "memcached") | nindent 4 }}
   annotations:
     {{- toYaml .annotations | nindent 4 }}
 spec:
@@ -13,15 +17,15 @@ spec:
   replicas: {{ .replicas }}
   selector:
     matchLabels:
-      {{- include "mimir.selectorLabels" (dict "ctx" $ "component" "memcached") | nindent 6 }}
+      {{- include "mimir.selectorLabels" (dict "ctx" $.ctx "component" $.component) | nindent 6 }}
   updateStrategy:
     {{- toYaml .statefulStrategy | nindent 4 }}
-  serviceName: {{ template "mimir.fullname" $ }}-memcached
+  serviceName: {{ template "mimir.fullname" $.ctx }}-{{ $.component }}
 
   template:
     metadata:
       labels:
-        {{- include "mimir.podLabels" (dict "ctx" $ "component" "memcached") | nindent 8 }}
+        {{- include "mimir.podLabels" (dict "ctx" $.ctx "component" $.component) | nindent 8 }}
         {{- with .podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -31,7 +35,7 @@ spec:
         {{- end }}
 
     spec:
-      serviceAccountName: {{ template "mimir.serviceAccountName" $ }}
+      serviceAccountName: {{ template "mimir.serviceAccountName" $.ctx }}
       {{- if .priorityClassName }}
       priorityClassName: {{ .priorityClassName }}
       {{- end }}
@@ -39,9 +43,9 @@ spec:
         {{- toYaml .securityContext | nindent 8 }}
       initContainers:
         {{- toYaml .initContainers | nindent 8 }}
-      {{- if $.Values.image.pullSecrets }}
+      {{- if .image.pullSecrets }}
       imagePullSecrets:
-      {{- range $.Values.image.pullSecrets }}
+      {{- range .image.pullSecrets }}
         - name: {{ . }}
       {{- end }}
       {{- end }}
@@ -88,5 +92,6 @@ spec:
             - {{ $value }}
             {{- end }}
       {{- end }}
+{{- end -}}
 {{- end -}}
 {{- end -}}

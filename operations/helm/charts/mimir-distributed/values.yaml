@@ -133,12 +133,12 @@ mimir:
         dir: /data/tsdb
       bucket_store:
         sync_dir: /data/tsdb-sync
-        {{- if .Values.memcached.enabled }}
+        {{- if (index .Values "memcached-chunks").enabled }}
         chunks_cache:
           backend: memcached
           memcached:
-            addresses: dns+{{ .Release.Name }}-memcached-headless.{{ .Release.Namespace }}.svc:{{ .Values.memcached.port }}
-            max_item_size: {{ mul .Values.memcached.maxItemMemory 1024 1024 }}
+            addresses: dns+{{ .Release.Name }}-memcached-chunks-headless.{{ .Release.Namespace }}.svc:{{ (index .Values "memcached-chunks").port }}
+            max_item_size: {{ mul (index .Values "memcached-chunks").maxItemMemory 1024 1024 }}
             timeout: 450ms
         {{- end }}
         {{- if (index .Values "memcached-metadata").enabled }}
@@ -989,7 +989,7 @@ compactor:
   env: []
   extraEnvFrom: []
 
-memcached:
+memcached-chunks:
   # -- Specifies whether memcached should be enabled
   enabled: false
 
@@ -1001,6 +1001,7 @@ memcached:
     repository: memcached
     tag: 1.6.9-alpine
     pullPolicy: IfNotPresent
+    pullSecrets: []
 
   # -- Port of the memcached service
   port: 11211
@@ -1087,6 +1088,7 @@ memcached-index-queries:
     repository: memcached
     tag: 1.6.9-alpine
     pullPolicy: IfNotPresent
+    pullSecrets: []
 
   # -- Port of the memcached-index-queries service
   port: 11211
@@ -1139,7 +1141,7 @@ memcached-index-queries:
       memory: 2457Mi
     requests:
       cpu: 500m
-      # memory requests should be exceeded memcached-index-queries -m flag
+      # memory requests should exceeded allocatedMemory
       memory: 2457Mi  # (floor (* 1.2 2048))
 
   # -- Service annotations and labels
@@ -1173,6 +1175,7 @@ memcached-metadata:
     repository: memcached
     tag: 1.6.9-alpine
     pullPolicy: IfNotPresent
+    pullSecrets: []
 
   # -- Port of the memcached-metadata service
   port: 11211
@@ -1225,7 +1228,7 @@ memcached-metadata:
       memory: 614Mi
     requests:
       cpu: 500m
-      # memory requests should be exceeded memcached-metadata -m flag
+      # memory requests should exceeded allocatedMemory
       memory: 614Mi  # (floor (* 1.2 512))
 
   # -- Service annotations and labels
@@ -1259,6 +1262,7 @@ memcached-results:
     repository: memcached
     tag: 1.6.9-alpine
     pullPolicy: IfNotPresent
+    pullSecrets: []
 
   # -- Port of the memcached-results service
   port: 11211
@@ -1311,7 +1315,7 @@ memcached-results:
       memory: 614Mi
     requests:
       cpu: 500m
-      # memory requests should be exceeded memcached-results -m flag
+      # memory requests should exceeded allocatedMemory
       memory: 614Mi  # (floor (* 1.2 512))
 
   # -- Service annotations and labels

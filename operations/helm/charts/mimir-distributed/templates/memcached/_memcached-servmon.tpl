@@ -1,16 +1,20 @@
-{{ with (index .Values "memcached") }}
+{{/*
+memcached ServiceMonitor
+*/}}
+{{- define "mimir.memcached.serviceMonitor" -}}
+{{ with (index $.ctx.Values $.component) }}
 {{- if .enabled -}}
-{{- with $.Values.serviceMonitor }}
+{{- with $.ctx.Values.serviceMonitor }}
 {{- if .enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "mimir.resourceName" (dict "ctx" $ "component" "memcached") }}
+  name: {{ include "mimir.resourceName" (dict "ctx" $.ctx "component" $.component) }}
   {{- with .namespace }}
   namespace: {{ . }}
   {{- end }}
   labels:
-    {{- include "mimir.labels" (dict "ctx" $ "component" "memcached") | nindent 4 }}
+    {{- include "mimir.labels" (dict "ctx" $.ctx "component" $.component) | nindent 4 }}
     {{- with .labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -25,7 +29,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "mimir.selectorLabels" (dict "ctx" $ "component" "memcached") | nindent 6 }}
+      {{- include "mimir.selectorLabels" (dict "ctx" $.ctx "component" $.component) | nindent 6 }}
     matchExpressions:
       - key: prometheus.io/service-monitor
         operator: NotIn
@@ -41,9 +45,9 @@ spec:
       {{- end }}
       relabelings:
         - sourceLabels: [job]
-          replacement: "{{ $.Release.Namespace }}/memcached"
+          replacement: "{{ $.Release.Namespace }}/{{ $.component }}"
           targetLabel: job
-        - replacement: "{{ include "mimir.clusterName" $ }}"
+        - replacement: "{{ include "mimir.clusterName" $.ctx }}"
           targetLabel: cluster
         {{- with .relabelings }}
         {{- toYaml . | nindent 8 }}
@@ -55,6 +59,7 @@ spec:
       tlsConfig:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}

@@ -13,7 +13,7 @@ Entries should include a reference to the Pull Request that introduced the chang
 
 ## main / unreleased
 
-* [CHANGE] Use custom memcached templates to break bitnami dependency. #2064
+* [CHANGE] Use custom memcached templates to remove bitnami dependency. #2064
 * [CHANGE] Change default value for `blocks_storage.bucket_store.chunks_cache.memcached.timeout` to `450ms` to increase use of cached data. #2035
 * [ENHANCEMENT] Add `global.extraEnv` and `global.extraEnvFrom` to values. This enables setting common environment variables and common injection of secrets to the POD environment of Mimir/GEM services and Nginx. Memcached and minio are out of scope for now. #2031
 * [ENHANCEMENT] Add `extraEnvFrom` capability to all Mimir services to enable injecting secrets via environment variables. #2017

@@ -1,7 +1,6 @@
 ---
 patch_rules:
 
-- remove_field: '/spec/template/metadata/annotations'
 - remove_field: '/spec/template/spec/containers'
 - remove_field: '/spec/template/spec/serviceAccount'
 - remove_field: '/spec/template/spec/serviceAccountName'

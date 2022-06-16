@@ -3,10 +3,10 @@
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: test-enterprise-configmap-values-mimir-store-gateway
+  name: mimir-store-gateway
   labels:
     app.kubernetes.io/name: mimir
-    app.kubernetes.io/instance: test-enterprise-configmap-values
+    app.kubernetes.io/instance: mimir
     app.kubernetes.io/component: store-gateway
     app.kubernetes.io/part-of: memberlist
     app.kubernetes.io/version: "2.1.0"
@@ -15,6 +15,6 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: mimir
-      app.kubernetes.io/instance: test-enterprise-configmap-values
+      app.kubernetes.io/instance: mimir
       app.kubernetes.io/component: store-gateway
   maxUnavailable: 1

@@ -3,10 +3,10 @@
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: test-enterprise-configmap-values-mimir
+  name: mimir
   labels:
     app.kubernetes.io/name: mimir
-    app.kubernetes.io/instance: test-enterprise-configmap-values
+    app.kubernetes.io/instance: mimir
     app.kubernetes.io/version: "2.1.0"
     app.kubernetes.io/managed-by: Helm
 spec:

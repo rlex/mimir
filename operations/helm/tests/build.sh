@@ -20,7 +20,7 @@ for FILEPATH in $TESTS; do
   OUTPUT_DIR="operations/helm/tests/${TEST_NAME}-generated"
 
   echo "Templating $TEST_NAME"
-  helm template "${TEST_NAME}" ${CHART_PATH} -f "${FILEPATH}" --output-dir "${OUTPUT_DIR}" --namespace citestns
+  helm template mimir ${CHART_PATH} -f "${FILEPATH}" --output-dir "${OUTPUT_DIR}" --namespace citestns
 
   echo "Removing mutable config checksum and helm chart version for clarity"
   find "${OUTPUT_DIR}/$(basename ${CHART_PATH})/templates" -type f -print0 | xargs -0 sed -E -i -- "/^[ ]+(checksum\/config|(helm.sh\/)?chart):/d"

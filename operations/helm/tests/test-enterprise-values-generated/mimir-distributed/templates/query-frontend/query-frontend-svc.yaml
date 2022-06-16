@@ -3,10 +3,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: test-enterprise-values-mimir-query-frontend
+  name: mimir-query-frontend
   labels:
     app.kubernetes.io/name: mimir
-    app.kubernetes.io/instance: test-enterprise-values
+    app.kubernetes.io/instance: mimir
     app.kubernetes.io/component: query-frontend
     app.kubernetes.io/version: "2.1.0"
     app.kubernetes.io/managed-by: Helm
@@ -25,5 +25,5 @@ spec:
       targetPort: grpc
   selector:
     app.kubernetes.io/name: mimir
-    app.kubernetes.io/instance: test-enterprise-values
+    app.kubernetes.io/instance: mimir
     app.kubernetes.io/component: query-frontend

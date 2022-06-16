@@ -3,11 +3,11 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: test-enterprise-configmap-values-minio
+  name: mimir-minio
   labels:
     app: minio
     chart: minio-8.0.10
-    release: test-enterprise-configmap-values
+    release: mimir
     heritage: Helm
 spec:
   accessModes:

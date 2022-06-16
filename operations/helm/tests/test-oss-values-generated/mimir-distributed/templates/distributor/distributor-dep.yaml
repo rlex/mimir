@@ -3,10 +3,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: test-oss-values-mimir-distributor
+  name: mimir-distributor
   labels:
     app.kubernetes.io/name: mimir
-    app.kubernetes.io/instance: test-oss-values
+    app.kubernetes.io/instance: mimir
     app.kubernetes.io/component: distributor
     app.kubernetes.io/part-of: memberlist
     app.kubernetes.io/version: "2.1.0"
@@ -18,7 +18,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: mimir
-      app.kubernetes.io/instance: test-oss-values
+      app.kubernetes.io/instance: mimir
       app.kubernetes.io/component: distributor
   strategy:
     rollingUpdate:
@@ -29,7 +29,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: mimir
-        app.kubernetes.io/instance: test-oss-values
+        app.kubernetes.io/instance: mimir
         app.kubernetes.io/version: "2.1.0"
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: distributor
@@ -37,7 +37,7 @@ spec:
       annotations:
         minio-secret-version: "42"
     spec:
-      serviceAccountName: test-oss-values-mimir
+      serviceAccountName: mimir
       securityContext:
         {}
       initContainers:
@@ -103,12 +103,12 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: test-oss-values-mimir-config
+            name: mimir-config
             items:
               - key: "mimir.yaml"
                 path: "mimir.yaml"
         - name: runtime-config
           configMap:
-            name: test-oss-values-mimir-runtime
+            name: mimir-runtime
         - name: storage
           emptyDir: {}

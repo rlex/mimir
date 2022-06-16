@@ -7,17 +7,17 @@ metadata:
     {}
   labels:
     app.kubernetes.io/name: mimir
-    app.kubernetes.io/instance: test-enterprise-values
+    app.kubernetes.io/instance: mimir
     app.kubernetes.io/component: gateway
     app.kubernetes.io/version: "2.1.0"
     app.kubernetes.io/managed-by: Helm
-  name: test-enterprise-values-mimir-gateway
+  name: mimir-gateway
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: mimir
-      app.kubernetes.io/instance: test-enterprise-values
+      app.kubernetes.io/instance: mimir
       app.kubernetes.io/component: gateway
   strategy:
     rollingUpdate:
@@ -28,13 +28,13 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: mimir
-        app.kubernetes.io/instance: test-enterprise-values
+        app.kubernetes.io/instance: mimir
         app.kubernetes.io/version: "2.1.0"
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: gateway
       annotations:
     spec:
-      serviceAccountName: test-enterprise-values-mimir
+      serviceAccountName: mimir
       securityContext:
         {}
       initContainers:
@@ -86,12 +86,12 @@ spec:
       volumes:
         - name: config
           secret:
-            secretName: test-enterprise-values-mimir-config
+            secretName: mimir-config
         - name: runtime-config
           configMap:
-            name: test-enterprise-values-mimir-runtime
+            name: mimir-runtime
         - name: license
           secret:
-            secretName: test-enterprise-values-mimir-license
+            secretName: mimir-license
         - name: storage
           emptyDir: {}

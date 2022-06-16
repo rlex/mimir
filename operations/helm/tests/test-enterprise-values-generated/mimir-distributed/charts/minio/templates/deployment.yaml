@@ -3,11 +3,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: test-enterprise-values-minio
+  name: mimir-minio
   labels:
     app: minio
     chart: minio-8.0.10
-    release: test-enterprise-values
+    release: mimir
     heritage: Helm
 spec:
   strategy:
@@ -18,18 +18,18 @@ spec:
   selector:
     matchLabels:
       app: minio
-      release: test-enterprise-values
+      release: mimir
   template:
     metadata:
-      name: test-enterprise-values-minio
+      name: mimir-minio
       labels:
         app: minio
-        release: test-enterprise-values
+        release: mimir
       annotations:
-        checksum/secrets: aac2dea246043210c2649ffaf6c6ea57cd94d0aaf2b21759b8b38a093096478e
-        checksum/config: 8109517e3e9f729fb84cca8217b59099354497df0ca310f4e4b07d4951b02dc4
+        checksum/secrets: 4705f23012cd0e1f52ba3b13e798294d8e06feca99d4c1bce5b675a24cf2f59a
+        checksum/config: 2ea1f6e7c68999a1896b3d65b046d96e5fc79dacb120123c71915ce97c91ac6b
     spec:
-      serviceAccountName: "test-enterprise-values-minio"
+      serviceAccountName: "mimir-minio"
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
@@ -52,12 +52,12 @@ spec:
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: test-enterprise-values-minio
+                  name: mimir-minio
                   key: accesskey
             - name: MINIO_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: test-enterprise-values-minio
+                  name: mimir-minio
                   key: secretkey
           resources:
             requests:
@@ -66,7 +66,7 @@ spec:
       volumes:
         - name: export
           persistentVolumeClaim:
-            claimName: test-enterprise-values-minio
+            claimName: mimir-minio
         - name: minio-user
           secret:
-            secretName: test-enterprise-values-minio
+            secretName: mimir-minio

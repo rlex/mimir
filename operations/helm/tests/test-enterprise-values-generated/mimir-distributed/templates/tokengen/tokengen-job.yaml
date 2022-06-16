@@ -3,10 +3,10 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: test-enterprise-values-mimir-tokengen
+  name: mimir-tokengen
   labels:
     app.kubernetes.io/name: mimir
-    app.kubernetes.io/instance: test-enterprise-values
+    app.kubernetes.io/instance: mimir
     app.kubernetes.io/component: tokengen
     app.kubernetes.io/version: "2.1.0"
     app.kubernetes.io/managed-by: Helm
@@ -21,12 +21,12 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: mimir
-        app.kubernetes.io/instance: test-enterprise-values
+        app.kubernetes.io/instance: mimir
         app.kubernetes.io/version: "2.1.0"
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: tokengen
     spec:
-      serviceAccountName: test-enterprise-values-mimir
+      serviceAccountName: mimir
       securityContext:
         null
       initContainers:
@@ -50,9 +50,9 @@ spec:
       volumes:
         - name: config
           secret:
-            secretName: test-enterprise-values-mimir-config
+            secretName: mimir-config
         - name: license
           secret:
-            secretName: test-enterprise-values-mimir-license
+            secretName: mimir-license
         - name: storage
           emptyDir: {}

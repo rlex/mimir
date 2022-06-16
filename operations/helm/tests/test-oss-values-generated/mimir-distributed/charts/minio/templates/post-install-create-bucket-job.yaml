@@ -3,11 +3,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: test-oss-values-minio-make-bucket-job
+  name: mimir-minio-make-bucket-job
   labels:
     app: minio-make-bucket-job
     chart: minio-8.0.10
-    release: test-oss-values
+    release: mimir
     heritage: Helm
   annotations:
     "helm.sh/hook": post-install,post-upgrade
@@ -17,7 +17,7 @@ spec:
     metadata:
       labels:
         app: minio-job
-        release: test-oss-values
+        release: mimir
     spec:
       restartPolicy: OnFailure      
       volumes:
@@ -25,10 +25,10 @@ spec:
           projected:
             sources:
             - configMap:
-                name: test-oss-values-minio
+                name: mimir-minio
             - secret:
-                name: test-oss-values-minio
-      serviceAccountName: "test-oss-values-minio"
+                name: mimir-minio
+      serviceAccountName: "mimir-minio"
       containers:
       - name: minio-mc
         image: "minio/mc:RELEASE.2021-02-14T04-28-06Z"
@@ -36,7 +36,7 @@ spec:
         command: ["/bin/sh", "/config/initialize"]
         env:
           - name: MINIO_ENDPOINT
-            value: test-oss-values-minio
+            value: mimir-minio
           - name: MINIO_PORT
             value: "9000"
         volumeMounts:

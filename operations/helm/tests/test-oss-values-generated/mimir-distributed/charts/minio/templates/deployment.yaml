@@ -3,11 +3,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: test-oss-values-minio
+  name: mimir-minio
   labels:
     app: minio
     chart: minio-8.0.10
-    release: test-oss-values
+    release: mimir
     heritage: Helm
 spec:
   strategy:
@@ -18,18 +18,18 @@ spec:
   selector:
     matchLabels:
       app: minio
-      release: test-oss-values
+      release: mimir
   template:
     metadata:
-      name: test-oss-values-minio
+      name: mimir-minio
       labels:
         app: minio
-        release: test-oss-values
+        release: mimir
       annotations:
-        checksum/secrets: f7d601b8641bf40718836a3781f3547aa41f4d5a36774f49fbe5353840847956
-        checksum/config: 32ca71423a92c84343fe0ae8158915116831302093797101294d27b284a8c78b
+        checksum/secrets: 4705f23012cd0e1f52ba3b13e798294d8e06feca99d4c1bce5b675a24cf2f59a
+        checksum/config: 2ea1f6e7c68999a1896b3d65b046d96e5fc79dacb120123c71915ce97c91ac6b
     spec:
-      serviceAccountName: "test-oss-values-minio"
+      serviceAccountName: "mimir-minio"
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
@@ -52,12 +52,12 @@ spec:
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: test-oss-values-minio
+                  name: mimir-minio
                   key: accesskey
             - name: MINIO_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: test-oss-values-minio
+                  name: mimir-minio
                   key: secretkey
           resources:
             requests:
@@ -66,7 +66,7 @@ spec:
       volumes:
         - name: export
           persistentVolumeClaim:
-            claimName: test-oss-values-minio
+            claimName: mimir-minio
         - name: minio-user
           secret:
-            secretName: test-oss-values-minio
+            secretName: mimir-minio

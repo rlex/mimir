@@ -3,11 +3,11 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: test-enterprise-configmap-values-minio-update-prometheus-secret
+  name: mimir-minio-update-prometheus-secret
   labels:
     app: minio-update-prometheus-secret
     chart: minio-8.0.10
-    release: test-enterprise-configmap-values
+    release: mimir
     heritage: Helm
 rules:
   - apiGroups:
@@ -20,7 +20,7 @@ rules:
       - update
       - patch
     resourceNames:
-      - test-enterprise-configmap-values-minio-prometheus
+      - mimir-minio-prometheus
   - apiGroups:
       - ""
     resources:
@@ -34,4 +34,4 @@ rules:
     verbs:
       - get
     resourceNames:
-      - test-enterprise-configmap-values-minio
+      - mimir-minio

@@ -3,10 +3,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: test-enterprise-configmap-values-mimir-querier
+  name: mimir-querier
   labels:
     app.kubernetes.io/name: mimir
-    app.kubernetes.io/instance: test-enterprise-configmap-values
+    app.kubernetes.io/instance: mimir
     app.kubernetes.io/component: querier
     app.kubernetes.io/part-of: memberlist
     app.kubernetes.io/version: "2.1.0"
@@ -18,7 +18,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: mimir
-      app.kubernetes.io/instance: test-enterprise-configmap-values
+      app.kubernetes.io/instance: mimir
       app.kubernetes.io/component: querier
   strategy:
     rollingUpdate:
@@ -29,7 +29,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: mimir
-        app.kubernetes.io/instance: test-enterprise-configmap-values
+        app.kubernetes.io/instance: mimir
         app.kubernetes.io/version: "2.1.0"
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: querier
@@ -37,7 +37,7 @@ spec:
       annotations:
         minio-secret-version: "42"
     spec:
-      serviceAccountName: test-enterprise-configmap-values-mimir
+      serviceAccountName: mimir
       securityContext:
         {}
       initContainers:
@@ -107,15 +107,15 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: test-enterprise-configmap-values-mimir-config
+            name: mimir-config
             items:
               - key: "mimir.yaml"
                 path: "mimir.yaml"
         - name: license
           secret:
-            secretName: test-enterprise-configmap-values-mimir-license
+            secretName: mimir-license
         - name: runtime-config
           configMap:
-            name: test-enterprise-configmap-values-mimir-runtime
+            name: mimir-runtime
         - name: storage
           emptyDir: {}

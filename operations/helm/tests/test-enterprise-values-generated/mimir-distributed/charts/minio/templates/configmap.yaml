@@ -3,11 +3,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: test-enterprise-values-minio
+  name: mimir-minio
   labels:
     app: minio
     chart: minio-8.0.10
-    release: test-enterprise-values
+    release: mimir
     heritage: Helm
 data:
   initialize: |-

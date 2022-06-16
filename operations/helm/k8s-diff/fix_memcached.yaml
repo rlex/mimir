@@ -1,0 +1,88 @@
+---
+patch_rules:
+# NOTE: these rules depend on the rules in helm_labels.yaml to rename labels
+
+- name: "Rename /metadata/labels/memcached-queries to memcached-index-queries"
+  match:
+  - /metadata/labels/name: [memcached-queries]
+  steps:
+  - op: replace
+    path: "/metadata/labels/name"
+    value: memcached-index-queries
+
+- name: "Rename /spec/selector/memcached-queries to memcached-index-queries"
+  match:
+  - /spec/selector/name: [memcached-queries]
+  steps:
+  - op: replace
+    path: "/spec/selector/name"
+    value: memcached-index-queries
+
+- name: "Rename /spec/selector/matchLabels/memcached-queries to memcached-index-queries"
+  match:
+  - /spec/selector/matchLabels/name: [memcached-queries]
+  steps:
+  - op: replace
+    path: "/spec/selector/matchLabels/name"
+    value: memcached-index-queries
+
+- name: "Rename /spec/template/metadata/labels/memcached-queries to memcached-index-queries"
+  match:
+  - /spec/template/metadata/labels/name: [memcached-queries]
+  steps:
+  - op: replace
+    path: "/spec/template/metadata/labels/name"
+    value: memcached-index-queries
+
+- name: "Rename /metadata/labels/memcached-results to memcached-frontend"
+  match:
+  - /metadata/labels/name: [memcached-results]
+  steps:
+  - op: replace
+    path: "/metadata/labels/name"
+    value: memcached-frontend
+
+- name: "Rename /spec/selector/memcached-results to memcached-frontend"
+  match:
+  - /spec/selector/name: [memcached-results]
+  steps:
+  - op: replace
+    path: "/spec/selector/name"
+    value: memcached-frontend
+
+- name: "Rename /spec/selector/matchLabels/memcached-results to memcached-frontend"
+  match:
+  - /spec/selector/matchLabels/name: [memcached-results]
+  steps:
+  - op: replace
+    path: "/spec/selector/matchLabels/name"
+    value: memcached-frontend
+
+- name: "Rename /spec/template/metadata/labels/memcached-results to memcached-frontend"
+  match:
+  - /spec/template/metadata/labels/name: [memcached-results]
+  steps:
+  - op: replace
+    path: "/spec/template/metadata/labels/name"
+    value: memcached-frontend
+
+- name: "Fix memcached Service ports to match exactly"
+  match:
+  - /kind: [Service]
+  - /spec/ports/1/name: [exporter-http-metrics]
+  steps:
+  - op: replace
+    path: /spec/ports/0/name
+    value: memcache
+  - op: replace
+    path: /spec/ports/0/targetPort
+    value: memcache
+  - op: remove
+    path: /spec/ports/1
+
+- name: "Remove labels from memcached"
+  match:
+  - /metadata/labels/name: [memcached, memcached-index-queries, memcached-metadata, memcached-frontend]
+  steps:
+  - op: remove
+    path: /metadata/labels

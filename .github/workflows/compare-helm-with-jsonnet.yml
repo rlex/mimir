@@ -1,0 +1,16 @@
+name: compare-helm-with-jsonnet
+
+on:
+  push:
+    branches:
+      - logiraptor/use-k8s-diff
+
+jobs:
+  compare-manifests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: grafana/k8s-diff/setup-k8s-diff@add-github-actions
+    - uses: actions/checkout@v2
+    - uses: helm/kind-action@v1.2.0
+    - run: ./operations/helm/k8s-diff/compare-with-jsonnet | tee $GITHUB_STEP_SUMMARY
+      shell: bash

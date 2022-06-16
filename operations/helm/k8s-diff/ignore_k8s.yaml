@@ -1,0 +1,66 @@
+---
+patch_rules:
+
+- remove_field: '/spec/template/metadata/annotations'
+- remove_field: '/spec/template/spec/containers'
+- remove_field: '/spec/template/spec/serviceAccount'
+- remove_field: '/spec/template/spec/serviceAccountName'
+- remove_field: '/spec/template/metadata/labels/gossip_ring_member'
+  match:
+  - /kind: ["StatefulSet"]
+
+- remove_field: '/spec/template/spec/volumes'
+- remove_field: '/spec/template/spec/affinity'
+- remove_field: '/spec/replicas'
+
+- remove_field: '/metadata/labels/name'
+  match:
+  - /kind: ['PodDisruptionBudget']
+- remove_field: '/spec/maxUnavailable'
+  match:
+  - /kind: ['PodDisruptionBudget']
+
+- remove_field: '/metadata/labels'
+  match:
+  - /kind: ['ConfigMap']
+- remove_field: /data
+  match:
+  - /kind: [ConfigMap]
+
+- remove_field: '/spec/strategy'
+  match:
+  - /kind: ['Deployment']
+- remove_field: '/spec/minReadySeconds'
+  match:
+  - /kind: ['Deployment']
+- remove_field: '/spec/template/spec/terminationGracePeriodSeconds'
+  match:
+  - /kind: ['Deployment']
+- remove_field: '/metadata/labels'
+  match:
+  - /kind: ['Deployment']
+
+- remove_field: '/spec/serviceName'
+  match:
+  - /kind: ["StatefulSet"]
+- remove_field: '/spec/podManagementPolicy'
+  match:
+  - /kind: ["StatefulSet"]
+- remove_field: '/spec/template/spec/securityContext'
+  match:
+  - /kind: ["StatefulSet"]
+- remove_field: '/spec/template/spec/terminationGracePeriodSeconds'
+  match:
+  - /kind: ["StatefulSet"]
+- remove_field: '/spec/updateStrategy/rollingUpdate'
+  match:
+  - /kind: ["StatefulSet"]
+- remove_field: '/spec/volumeClaimTemplates/0/metadata/name'
+  match:
+  - /kind: ["StatefulSet"]
+- remove_field: '/spec/volumeClaimTemplates/0/spec/resources/requests/storage'
+  match:
+  - /kind: ["StatefulSet"]
+- remove_field: '/spec/volumeClaimTemplates/0/spec/storageClassName'
+  match:
+  - /kind: ["StatefulSet"]

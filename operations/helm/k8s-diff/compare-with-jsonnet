@@ -1,0 +1,74 @@
+#!/bin/bash
+
+set -e
+
+cd "$(dirname "$0")"
+
+operationsDir="$(pwd)/../../"
+
+helmInput="$operationsDir/helm/tests/test-jsonnet-parity-values-generated"
+jsonnetInput="$operationsDir/mimir-tests/test-helm-parity-generated.yaml"
+outputDir="$operationsDir/scratch"
+helmOutput="$outputDir/helm"
+jsonnetOutput="$outputDir/jsonnet"
+
+[[ -d "$outputDir" ]] && rm -r "$outputDir"
+
+# Fix up the large-scale differences between the two manifest directories
+# We ignore some objects that are missing in the jsonnet or helm versions
+# We also rename some objects to match the jsonnet version
+yaml-patch \
+    -input-dir "$jsonnetInput" -output-dir "$jsonnetOutput/manifests" \
+    -input-dir "$helmInput" -output-dir "$helmOutput/manifests" \
+    -rules "$operationsDir/helm/k8s-diff/ignore_missing_objects.yaml" \
+    -rules "$operationsDir/helm/k8s-diff/fix_k8s_names.yaml" \
+    -output-template "{{.metadata.name}}-{{.kind}}.yaml"
+
+# Extract the Mimir configuration from each of the manifests
+# This uses mimir itself to resolve cli flags / config file / defaults
+config-generate -input-dir "$helmOutput/manifests" -output-dir "$helmOutput/config"
+config-generate -input-dir "$jsonnetOutput/manifests" -output-dir "$jsonnetOutput/config"
+
+config-defaults -input-dir "$helmOutput/config" -output-dir "$helmOutput/config"
+config-defaults -input-dir "$jsonnetOutput/config" -output-dir "$jsonnetOutput/config"
+
+# # Patch the Mimir configuration to remove differences we don't care about
+yaml-patch \
+    -input-dir "$jsonnetOutput/config" -output-dir "$jsonnetOutput/config" \
+    -input-dir "$helmOutput/config" -output-dir "$helmOutput/config" \
+    -rules "$operationsDir/helm/k8s-diff/ignore_config.yaml" \
+    -rules "$operationsDir/helm/k8s-diff/config_todo.yaml" \
+    -output-template "{{.target}}-config.yaml" \
+    -print-todo
+
+# # Finally, remove any values matching the defaults
+# # These are not useful for comparison since they have no effect
+k8s-defaults -input-dir "$helmOutput/manifests" -output-dir "$helmOutput/manifests"
+k8s-defaults -input-dir "$jsonnetOutput/manifests" -output-dir "$jsonnetOutput/manifests"
+
+# # Patch the k8s manifests to remove any differences we don't care about
+yaml-patch \
+    -input-dir "$jsonnetOutput/manifests" -output-dir "$jsonnetOutput/manifests" \
+    -input-dir "$helmOutput/manifests" -output-dir "$helmOutput/manifests" \
+    -rules "$operationsDir/helm/k8s-diff/fix_labels.yaml" \
+    -rules "$operationsDir/helm/k8s-diff/fix_memberlist.yaml" \
+    -rules "$operationsDir/helm/k8s-diff/fix_memcached.yaml" \
+    -rules "$operationsDir/helm/k8s-diff/fix_services.yaml" \
+    -rules "$operationsDir/helm/k8s-diff/ignore_config_file.yaml" \
+    -rules "$operationsDir/helm/k8s-diff/ignore_k8s.yaml" \
+    -rules "$operationsDir/helm/k8s-diff/k8s_todo.yaml"
+
+set +e
+
+cd $outputDir
+diffOutput="$(diff -r -u helm/ jsonnet/)"
+
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "## Unexpected Differences Found:"
+    echo ""
+    echo '```diff'
+    echo "$diffOutput"
+    echo '```'
+    exit 1
+fi

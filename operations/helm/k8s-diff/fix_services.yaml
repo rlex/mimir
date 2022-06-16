@@ -1,0 +1,55 @@
+---
+patch_rules:
+
+- name: "Rename http ports in Services"
+  match:
+  - /kind: [Service]
+  - /spec/ports/0/port: [8080]
+  steps:
+  - op: replace
+    path: /spec/ports/0/name
+    value: http-metrics
+  - op: replace
+    path: /spec/ports/0/targetPort
+    value: http-metrics
+
+- name: "Rename grpc ports in Services"
+  match:
+  - /kind: [Service]
+  - /spec/ports/1/port: [9095]
+  steps:
+  - op: replace
+    path: /spec/ports/1/name
+    value: grpc
+  - op: replace
+    path: /spec/ports/1/targetPort
+    value: grpc
+
+- name: "Remove overrides exporter grpc port"
+  match:
+  - /kind: [Service]
+  - /metadata/name: [overrides-exporter]
+  - /spec/ports/1/name: [grpc]
+  steps:
+  - op: remove
+    path: /spec/ports/1
+
+- name: "Remove ruler grpc port"
+  match:
+  - /kind: [Service]
+  - /metadata/name: [ruler]
+  - /spec/ports/1/name: [grpc]
+  steps:
+  - op: remove
+    path: /spec/ports/1
+
+- name: "Fix alertmanager ports to match exactly"
+  match:
+  - /kind: [Service]
+  - /spec/ports/2/name: [cluster]
+  steps:
+  - op: remove
+    path: /spec/ports/2
+  - op: remove
+    path: /spec/publishNotReadyAddresses
+  

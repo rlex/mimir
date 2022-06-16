@@ -1,0 +1,23 @@
+---
+patch_rules:
+
+- name: "Helm's compactor service is not headless"
+  todo: true
+  match:
+  - /kind: [Service]
+  - /metadata/name: [compactor]
+  remove_field: /spec/clusterIP
+
+- name: "Helm's compactor service is not headless"
+  todo: true
+  match:
+  - /kind: [Service]
+  - /metadata/name: [compactor]
+  remove_field: /spec/clusterIPs
+
+- name: "Helm's headless distributor service does not include an HTTP port"
+  todo: true
+  match:
+  - /kind: [Service]
+  - /metadata/name: [distributor]
+  remove_field: /spec/ports

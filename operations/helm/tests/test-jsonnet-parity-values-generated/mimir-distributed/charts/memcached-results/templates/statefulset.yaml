@@ -1,0 +1,86 @@
+---
+# Source: mimir-distributed/charts/memcached-results/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mimir-memcached-results
+  labels:
+    app.kubernetes.io/name: memcached-results
+    helm.sh/chart: memcached-results-5.5.2
+    app.kubernetes.io/instance: mimir
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: memcached-results
+      app.kubernetes.io/instance: mimir
+  replicas: 1
+  serviceName: mimir-memcached-results
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: memcached-results
+        helm.sh/chart: memcached-results-5.5.2
+        app.kubernetes.io/instance: mimir
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: memcached-results
+                    app.kubernetes.io/instance: mimir
+                namespaces:
+                  - "citestns"
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+        runAsUser: 1001
+      containers:
+        - name: memcached
+          image: docker.io/memcached:1.6.9
+          imagePullPolicy: "IfNotPresent"
+          args:
+            - -m 512
+            - -o
+            - modern
+            - -v
+            - -I 1m
+            - -c 1024
+          ports:
+            - name: memcache
+              containerPort: 11211
+          livenessProbe:
+            tcpSocket:
+              port: memcache
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            tcpSocket:
+              port: memcache
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+            periodSeconds: 5
+          resources:
+            limits:
+              memory: 614Mi
+            requests:
+              cpu: 500m
+              memory: 614Mi
+          securityContext:
+            readOnlyRootFilesystem: false
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

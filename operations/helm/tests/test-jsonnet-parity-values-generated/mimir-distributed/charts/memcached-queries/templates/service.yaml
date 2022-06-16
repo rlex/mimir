@@ -1,0 +1,22 @@
+---
+# Source: mimir-distributed/charts/memcached-queries/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mimir-memcached-queries
+  labels:
+    app.kubernetes.io/name: memcached-queries
+    helm.sh/chart: memcached-queries-5.5.2
+    app.kubernetes.io/instance: mimir
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: memcache
+      port: 11211
+      targetPort: memcache
+      nodePort: null
+  selector:
+    app.kubernetes.io/name: memcached-queries
+    app.kubernetes.io/instance: mimir

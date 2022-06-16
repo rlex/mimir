@@ -1,0 +1,25 @@
+memcached:
+    enabled: true
+    metrics:
+        enabled: false
+memcached-queries:
+    enabled: true
+    metrics:
+        enabled: false
+memcached-metadata:
+    enabled: true
+    metrics:
+        enabled: false
+memcached-results:
+    enabled: true
+    metrics:
+        enabled: false
+minio:
+    enabled: false
+nginx:
+    enabled: false
+rbac:
+    create: false
+    pspEnabled: false
+serviceAccount:
+    create: false

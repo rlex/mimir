@@ -265,9 +265,11 @@ serviceMonitor:
   # -- If enabled, ServiceMonitor resources for Prometheus Operator are created
   enabled: false
   # -- Alternative namespace for ServiceMonitor resources
+  # If left unset, the default is to install the ServiceMonitor resources in the namespace where the chart is installed, i.e. the namespace specified for the helm command.
   namespace: null
   # -- Namespace selector for ServiceMonitor resources
-  namespaceSelector: {}
+  # If left unset, the default is to select the namespace where the chart is installed, i.e. the namespace specified for the helm command.
+  namespaceSelector: null
   # -- ServiceMonitor annotations
   annotations: {}
   # -- Additional ServiceMonitor labels

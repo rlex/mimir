@@ -47,6 +47,8 @@
     },
   },
 
+  alertmanager_args+: if !$._config.memberlist_ring_enabled then {} else (setupGossipRing('alertmanager.sharding-ring.store', 'alertmanager.sharding-ring.consul.hostname', 'alertmanager.sharding-ring.multi') + memberlistConfig),
+
   distributor_args+: if !$._config.memberlist_ring_enabled then {} else (setupGossipRing('distributor.ring.store', 'distributor.ring.consul.hostname', 'distributor.ring.multi') + memberlistConfig),
 
   ruler_args+: if !$._config.memberlist_ring_enabled then {} else (setupGossipRing('ruler.ring.store', 'ruler.ring.consul.hostname', 'ruler.ring.multi') + memberlistConfig),
@@ -58,6 +60,7 @@
   local containerPort = $.core.v1.containerPort,
   local gossipPort = containerPort.newNamed(name='gossip-ring', containerPort=gossipRingPort),
 
+  alertmanager_ports+:: if !$._config.memberlist_ring_enabled then [] else [gossipPort],
   compactor_ports+:: if !$._config.memberlist_ring_enabled then [] else [gossipPort],
   distributor_ports+:: if !$._config.memberlist_ring_enabled then [] else [gossipPort],
   ingester_ports+:: if !$._config.memberlist_ring_enabled then [] else [gossipPort],
@@ -67,6 +70,9 @@
 
   // Don't add label to matcher, only to pod labels.
   local gossipLabel = $.apps.v1.statefulSet.spec.template.metadata.withLabelsMixin({ [$._config.gossip_member_label]: 'true' }),
+
+  alertmanager_statefulset+: if !$._config.memberlist_ring_enabled || !$._config.alertmanager_enabled then {} else
+    gossipLabel,
 
   compactor_statefulset+: if !$._config.memberlist_ring_enabled then {} else
     gossipLabel,

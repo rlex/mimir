@@ -504,13 +504,15 @@ func (t *Mimir) initFlusher() (serv services.Service, err error) {
 // initQueryFrontendTripperware instantiates the tripperware used by the query frontend
 // to optimize Prometheus query requests.
 func (t *Mimir) initQueryFrontendTripperware() (serv services.Service, err error) {
+	promqlEngineRegisterer := prometheus.WrapRegistererWith(prometheus.Labels{"engine": "query-frontend"}, prometheus.DefaultRegisterer)
+
 	tripperware, err := querymiddleware.NewTripperware(
 		t.Cfg.Frontend.QueryMiddleware,
 		util_log.Logger,
 		t.Overrides,
 		querymiddleware.PrometheusCodec,
 		querymiddleware.PrometheusResponseExtractor{},
-		engine.NewPromQLEngineOptions(t.Cfg.Querier.EngineConfig, t.ActivityTracker, util_log.Logger, prometheus.DefaultRegisterer),
+		engine.NewPromQLEngineOptions(t.Cfg.Querier.EngineConfig, t.ActivityTracker, util_log.Logger, promqlEngineRegisterer),
 		prometheus.DefaultRegisterer,
 	)
 	if err != nil {
@@ -574,7 +576,7 @@ func (t *Mimir) initRuler() (serv services.Service, err error) {
 		if err != nil {
 			return nil, err
 		}
-		remoteQuerier := ruler.NewRemoteQuerier(queryFrontendClient, t.Cfg.API.PrometheusHTTPPrefix, util_log.Logger, ruler.WithOrgIDMiddleware)
+		remoteQuerier := ruler.NewRemoteQuerier(queryFrontendClient, t.Cfg.Ruler.QueryFrontend.Timeout, t.Cfg.API.PrometheusHTTPPrefix, util_log.Logger, ruler.WithOrgIDMiddleware)
 
 		embeddedQueryable = prom_remote.NewSampleAndChunkQueryableClient(
 			remoteQuerier,

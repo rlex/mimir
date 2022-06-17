@@ -2639,7 +2639,7 @@
         },
         {
           "kind": "field",
-          "name": "active_series_custom_trackers_config",
+          "name": "active_series_custom_trackers",
           "required": false,
           "desc": "Additional custom trackers for active metrics. If there are active series matching a provided matcher (map value), the count will be exposed in the custom trackers metric labeled using the tracker name (map key). Zero valued counts are not exposed (and removed when they go back to zero).",
           "fieldValue": null,
@@ -5131,6 +5131,27 @@
               "fieldFlag": "blocks-storage.bucket-store.posting-offsets-in-mem-sampling",
               "fieldType": "int",
               "fieldCategory": "advanced"
+            },
+            {
+              "kind": "block",
+              "name": "index_header",
+              "required": false,
+              "desc": "",
+              "blockEntries": [
+                {
+                  "kind": "field",
+                  "name": "map_populate_enabled",
+                  "required": false,
+                  "desc": "If enabled, the store-gateway will attempt to pre-populate the file system cache when memory-mapping index-header files.",
+                  "fieldValue": null,
+                  "fieldDefaultValue": false,
+                  "fieldFlag": "blocks-storage.bucket-store.index-header.map-populate-enabled",
+                  "fieldType": "boolean",
+                  "fieldCategory": "experimental"
+                }
+              ],
+              "fieldValue": null,
+              "fieldDefaultValue": null
             }
           ],
           "fieldValue": null,
@@ -5348,6 +5369,17 @@
               "fieldFlag": "blocks-storage.tsdb.isolation-enabled",
               "fieldType": "boolean",
               "fieldCategory": "advanced"
+            },
+            {
+              "kind": "field",
+              "name": "allow_overlapping_queries",
+              "required": false,
+              "desc": "Enable querying overlapping blocks. If there are going to be overlapping blocks in the ingesters this should be enabled.",
+              "fieldValue": null,
+              "fieldDefaultValue": false,
+              "fieldFlag": "blocks-storage.tsdb.allow-overlapping-queries",
+              "fieldType": "boolean",
+              "fieldCategory": "experimental"
             },
             {
               "kind": "field",
@@ -7349,6 +7381,16 @@
               "fieldDefaultValue": "",
               "fieldFlag": "ruler.query-frontend.address",
               "fieldType": "string"
+            },
+            {
+              "kind": "field",
+              "name": "timeout",
+              "required": false,
+              "desc": "The timeout for a rule query being evaluated by the query-frontend.",
+              "fieldValue": null,
+              "fieldDefaultValue": 120000000000,
+              "fieldFlag": "ruler.query-frontend.timeout",
+              "fieldType": "duration"
             },
             {
               "kind": "block",

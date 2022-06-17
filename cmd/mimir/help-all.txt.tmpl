@@ -334,6 +334,8 @@ Usage of ./cmd/mimir/mimir:
     	If enabled, store-gateway will lazy load an index-header only once required by a query. (default true)
   -blocks-storage.bucket-store.index-header-lazy-loading-idle-timeout duration
     	If index-header lazy loading is enabled and this setting is > 0, the store-gateway will offload unused index-headers after 'idle timeout' inactivity. (default 1h0m0s)
+  -blocks-storage.bucket-store.index-header.map-populate-enabled
+    	[experimental] If enabled, the store-gateway will attempt to pre-populate the file system cache when memory-mapping index-header files.
   -blocks-storage.bucket-store.max-chunk-pool-bytes uint
     	Max size - in bytes - of a chunks pool, used to reduce memory allocations. The pool is shared across all tenants. 0 to disable the limit. (default 2147483648)
   -blocks-storage.bucket-store.max-concurrent int
@@ -475,6 +477,8 @@ Usage of ./cmd/mimir/mimir:
     	OpenStack Swift user ID.
   -blocks-storage.swift.username string
     	OpenStack Swift username.
+  -blocks-storage.tsdb.allow-overlapping-queries
+    	[experimental] Enable querying overlapping blocks. If there are going to be overlapping blocks in the ingesters this should be enabled.
   -blocks-storage.tsdb.block-ranges-period value
     	TSDB blocks range period. (default 2h0m0s)
   -blocks-storage.tsdb.close-idle-tsdb-timeout duration
@@ -1442,6 +1446,8 @@ Usage of ./cmd/mimir/mimir:
     	Path to the key file for the client certificate. Also requires the client certificate to be configured.
   -ruler.query-frontend.grpc-client-config.tls-server-name string
     	Override the expected name on the server certificate.
+  -ruler.query-frontend.timeout duration
+    	The timeout for a rule query being evaluated by the query-frontend. (default 2m0s)
   -ruler.query-stats-enabled
     	Report the wall time for ruler queries to complete as a per-tenant metric and as an info level log message.
   -ruler.resend-delay duration

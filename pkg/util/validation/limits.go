@@ -35,6 +35,11 @@ const (
 	maxMetadataLengthFlag      = "validation.max-metadata-length"
 	creationGracePeriodFlag    = "validation.create-grace-period"
 	maxQueryLengthFlag         = "store.max-query-length"
+	requestRateFlag            = "distributor.request-rate-limit"
+	requestBurstSizeFlag       = "distributor.request-burst-size"
+	ingestionRateFlag          = "distributor.ingestion-rate-limit"
+	ingestionBurstSizeFlag     = "distributor.ingestion-burst-size"
+	HATrackerMaxClustersFlag   = "distributor.ha-tracker.max-clusters"
 )
 
 // LimitError are errors that do not comply with the limits specified.
@@ -87,7 +92,9 @@ type Limits struct {
 	// Exemplars
 	MaxGlobalExemplarsPerUser int `yaml:"max_global_exemplars_per_user" json:"max_global_exemplars_per_user" category:"experimental"`
 	// Active series custom trackers
-	ActiveSeriesCustomTrackersConfig activeseries.CustomTrackersConfig `yaml:"active_series_custom_trackers_config" json:"active_series_custom_trackers_config" doc:"description=Additional custom trackers for active metrics. If there are active series matching a provided matcher (map value), the count will be exposed in the custom trackers metric labeled using the tracker name (map key). Zero valued counts are not exposed (and removed when they go back to zero)." category:"advanced"`
+	// TODO remove this with Mimir version 2.4
+	ActiveSeriesCustomTrackersConfigOld activeseries.CustomTrackersConfig `yaml:"active_series_custom_trackers_config" json:"active_series_custom_trackers_config" doc:"hidden"`
+	ActiveSeriesCustomTrackersConfig    activeseries.CustomTrackersConfig `yaml:"active_series_custom_trackers" json:"active_series_custom_trackers" doc:"description=Additional custom trackers for active metrics. If there are active series matching a provided matcher (map value), the count will be exposed in the custom trackers metric labeled using the tracker name (map key). Zero valued counts are not exposed (and removed when they go back to zero)." category:"advanced"`
 
 	// Querier enforced limits.
 	MaxChunksPerQuery              int            `yaml:"max_fetched_chunks_per_query" json:"max_fetched_chunks_per_query"`
@@ -147,14 +154,14 @@ type Limits struct {
 // RegisterFlags adds the flags required to config this to the given FlagSet
 func (l *Limits) RegisterFlags(f *flag.FlagSet) {
 	f.IntVar(&l.IngestionTenantShardSize, "distributor.ingestion-tenant-shard-size", 0, "The tenant's shard size used by shuffle-sharding. Must be set both on ingesters and distributors. 0 disables shuffle sharding.")
-	f.Float64Var(&l.RequestRate, "distributor.request-rate-limit", 0, "Per-tenant request rate limit in requests per second. 0 to disable.")
-	f.IntVar(&l.RequestBurstSize, "distributor.request-burst-size", 0, "Per-tenant allowed request burst size. 0 to disable.")
-	f.Float64Var(&l.IngestionRate, "distributor.ingestion-rate-limit", 10000, "Per-tenant ingestion rate limit in samples per second.")
-	f.IntVar(&l.IngestionBurstSize, "distributor.ingestion-burst-size", 200000, "Per-tenant allowed ingestion burst size (in number of samples).")
+	f.Float64Var(&l.RequestRate, requestRateFlag, 0, "Per-tenant request rate limit in requests per second. 0 to disable.")
+	f.IntVar(&l.RequestBurstSize, requestBurstSizeFlag, 0, "Per-tenant allowed request burst size. 0 to disable.")
+	f.Float64Var(&l.IngestionRate, ingestionRateFlag, 10000, "Per-tenant ingestion rate limit in samples per second.")
+	f.IntVar(&l.IngestionBurstSize, ingestionBurstSizeFlag, 200000, "Per-tenant allowed ingestion burst size (in number of samples).")
 	f.BoolVar(&l.AcceptHASamples, "distributor.ha-tracker.enable-for-all-users", false, "Flag to enable, for all tenants, handling of samples with external labels identifying replicas in an HA Prometheus setup.")
 	f.StringVar(&l.HAClusterLabel, "distributor.ha-tracker.cluster", "cluster", "Prometheus label to look for in samples to identify a Prometheus HA cluster.")
 	f.StringVar(&l.HAReplicaLabel, "distributor.ha-tracker.replica", "__replica__", "Prometheus label to look for in samples to identify a Prometheus HA replica.")
-	f.IntVar(&l.HAMaxClusters, "distributor.ha-tracker.max-clusters", 0, "Maximum number of clusters that HA tracker will keep track of for a single tenant. 0 to disable the limit.")
+	f.IntVar(&l.HAMaxClusters, HATrackerMaxClustersFlag, 0, "Maximum number of clusters that HA tracker will keep track of for a single tenant. 0 to disable the limit.")
 	f.Var(&l.DropLabels, "distributor.drop-label", "This flag can be used to specify label names that to drop during sample ingestion within the distributor and can be repeated in order to drop multiple labels.")
 	f.IntVar(&l.MaxLabelNameLength, maxLabelNameLengthFlag, 1024, "Maximum length accepted for label names")
 	f.IntVar(&l.MaxLabelValueLength, maxLabelValueLengthFlag, 2048, "Maximum length accepted for label value. This setting also applies to the metric name")
@@ -232,7 +239,17 @@ func (l *Limits) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		l.copyNotificationIntegrationLimits(defaultLimits.NotificationRateLimitPerIntegration)
 	}
 	type plain Limits
-	return unmarshal((*plain)(l))
+
+	err := unmarshal((*plain)(l))
+	if err != nil {
+		return err
+	}
+
+	if !l.ActiveSeriesCustomTrackersConfigOld.Empty() {
+		l.ActiveSeriesCustomTrackersConfig = l.ActiveSeriesCustomTrackersConfigOld
+		l.ActiveSeriesCustomTrackersConfigOld = activeseries.CustomTrackersConfig{}
+	}
+	return nil
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -250,7 +267,16 @@ func (l *Limits) UnmarshalJSON(data []byte) error {
 	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.DisallowUnknownFields()
 
-	return dec.Decode((*plain)(l))
+	err := dec.Decode((*plain)(l))
+	if err != nil {
+		return err
+	}
+
+	if !l.ActiveSeriesCustomTrackersConfigOld.Empty() {
+		l.ActiveSeriesCustomTrackersConfig = l.ActiveSeriesCustomTrackersConfigOld
+		l.ActiveSeriesCustomTrackersConfigOld = activeseries.CustomTrackersConfig{}
+	}
+	return nil
 }
 
 func (l *Limits) copyNotificationIntegrationLimits(defaults NotificationRateLimitMap) {

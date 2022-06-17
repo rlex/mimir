@@ -1400,6 +1400,10 @@ query_frontend:
   # CLI flag: -ruler.query-frontend.address
   [address: <string> | default = ""]
 
+  # The timeout for a rule query being evaluated by the query-frontend.
+  # CLI flag: -ruler.query-frontend.timeout
+  [timeout: <duration> | default = 2m]
+
   grpc_client_config:
     # (advanced) gRPC client max receive message size (bytes).
     # CLI flag: -ruler.query-frontend.grpc-client-config.grpc-max-recv-msg-size
@@ -2711,11 +2715,11 @@ The `limits` block configures default and per-tenant limits imposed by component
 #   The following configuration will count the active series coming from dev and
 #   prod namespaces for each tenant and label them as {name="dev"} and
 #   {name="prod"} in the cortex_ingester_active_series_custom_tracker metric.
-#   active_series_custom_trackers_config:
+#   active_series_custom_trackers:
 #       dev: '{namespace=~"dev-.*"}'
 #       prod: '{namespace=~"prod-.*"}'
 # CLI flag: -ingester.active-series-custom-trackers
-[active_series_custom_trackers_config: <map of tracker name (string) to matcher (string)> | default = ]
+[active_series_custom_trackers: <map of tracker name (string) to matcher (string)> | default = ]
 
 # Maximum number of chunks that can be fetched in a single query from ingesters
 # and long-term storage. This limit is enforced in the querier, ruler and
@@ -3397,6 +3401,12 @@ bucket_store:
   # CLI flag: -blocks-storage.bucket-store.posting-offsets-in-mem-sampling
   [postings_offsets_in_mem_sampling: <int> | default = 32]
 
+  index_header:
+    # (experimental) If enabled, the store-gateway will attempt to pre-populate
+    # the file system cache when memory-mapping index-header files.
+    # CLI flag: -blocks-storage.bucket-store.index-header.map-populate-enabled
+    [map_populate_enabled: <boolean> | default = false]
+
 tsdb:
   # Directory to store TSDBs (including WAL) in the ingesters. This directory is
   # required to be persisted between restarts.
@@ -3504,6 +3514,11 @@ tsdb:
   # improve performance.
   # CLI flag: -blocks-storage.tsdb.isolation-enabled
   [isolation_enabled: <boolean> | default = false]
+
+  # (experimental) Enable querying overlapping blocks. If there are going to be
+  # overlapping blocks in the ingesters this should be enabled.
+  # CLI flag: -blocks-storage.tsdb.allow-overlapping-queries
+  [allow_overlapping_queries: <boolean> | default = false]
 
   # (advanced) Max size - in bytes - of the in-memory series hash cache. The
   # cache is shared across all tenants and it's used only when query sharding is

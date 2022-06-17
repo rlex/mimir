@@ -22,24 +22,35 @@
   * The following metric is exposed to tell how many requests have been rejected:
     * `cortex_discarded_requests_total`
 * [ENHANCEMENT] Store-gateway: Add the experimental ability to run requests in a dedicated OS thread pool. This feature can be configured using `-store-gateway.thread-pool-size` and is disabled by default. Replaces the ability to run index header operations in a dedicated thread pool. #1660 #1812
-* [ENHANCEMENT] Improved error messages to make them easier to understand; each now have a unique, global identifier that you can use to look up in the runbooks for more information. #1907 #1919 #1888 #1939 #1984
+* [ENHANCEMENT] Improved error messages to make them easier to understand; each now have a unique, global identifier that you can use to look up in the runbooks for more information. #1907 #1919 #1888 #1939 #1984 #2009
 * [ENHANCEMENT] Memberlist KV: incoming messages are now processed on per-key goroutine. This may reduce loss of "maintanance" packets in busy memberlist installations, but use more CPU. New `memberlist_client_received_broadcasts_dropped_total` counter tracks number of dropped per-key messages. #1912
 * [ENHANCEMENT] Blocks Storage, Alertmanager, Ruler: add support a prefix to the bucket store (`*_storage.storage_prefix`). This enables using the same bucket for the three components. #1686 #1951
 * [ENHANCEMENT] Upgrade Docker base images to `alpine:3.16.0`. #2028
+* [ENHANCEMENT] Store-gateway: Add experimental configuration option for the store-gateway to attempt to pre-populate the file system cache when memory-mapping index-header files. Enabled with `-blocks-storage.bucket-store.index-header.map-populate-enabled=true`. Note this flag only has an effect when running on Linux. #2019 #2054
+* [ENHANCEMENT] Chunk Mapper: reduce memory usage of async chunk mapper. #2043
+* [ENHANCEMENT] Ingesters: Added new configuration option that makes it possible for mimir ingesters to perform queries on overlapping blocks in the filesystem. Enabled with `-blocks-storage.tsdb.allow-overlapping-queries`. #2091
+* [ENHANCEMENT] Ingester: reduce sleep time when reading WAL. #2098
 * [BUGFIX] Fix regexp parsing panic for regexp label matchers with start/end quantifiers. #1883
 * [BUGFIX] Ingester: fixed deceiving error log "failed to update cached shipped blocks after shipper initialisation", occurring for each new tenant in the ingester. #1893
 * [BUGFIX] Ring: fix bug where instances may appear unhealthy in the hash ring web UI even though they are not. #1933
 * [BUGFIX] API: gzip is now enforced when identity encoding is explicitly rejected. #1864
+* [BUGFIX] Fix panic at startup when Mimir is running in monolithic mode and query sharding is enabled. #2036
+* [BUGFIX] Ruler: report failed evaluation metric for any 5xx status code returned by the query-frontend when remote operational mode is enabled. #2053
+* [BUGFIX] Ingester: fix slow rollout when using `-ingester.ring.unregister-on-shutdown=false` with long `-ingester.ring.heartbeat-period`. #2085
+* [BUGFIX] Ruler: add timeout for remote rule evaluation queries to prevent rule group evaluations getting stuck indefinitely. The duration is configurable with  (`-ruler.query-frontend.timeout` (default `2m`). #2090
+* [BUGFIX] Limits: Active series custom tracker configuration has been named back from `active_series_custom_trackers_config` to `active_series_custom_trackers`. For backwards compatibility both version is going to be supported for until Mimir v2.4. When both fields are specified, `active_series_custom_trackers_config` takes precedence over `active_series_custom_trackers`. #2101
 
 ### Mixin
 
 * [CHANGE] Split `mimir_queries` rules group into `mimir_queries` and `mimir_ingester_queries` to keep number of rules per group within the default per-tenant limit. #1885
 * [CHANGE] Dashboards: Expose full image tag in "Mimir / Rollout progress" dashboard's "Pod per version panel." #1932
 * [CHANGE] Dashboards: Disabled gateway panels by default, because most users don't have a gateway exposing the metrics expected by Mimir dashboards. You can re-enable it setting `gateway_enabled: true` in the mixin config and recompiling the mixin running `make build-mixin`. #1954
+* [CHANGE] Alerts: adapt `MimirFrontendQueriesStuck` and `MimirSchedulerQueriesStuck` to consider ruler query path components. #1949
 * [ENHANCEMENT] Dashboards: Add config option `datasource_regex` to customise the regular expression used to select valid datasources for Mimir dashboards. #1802
 * [ENHANCEMENT] Dashboards: Added "Mimir / Remote ruler reads" and "Mimir / Remote ruler reads resources" dashboards. #1911 #1937
 * [ENHANCEMENT] Dashboards: Make networking panels work for pods created by the mimir-distributed helm chart. #1927
 * [ENHANCEMENT] Alerts: Add `MimirStoreGatewayNoSyncedTenants` alert that fires when there is a store-gateway owning no tenants. #1882
+* [ENHANCEMENT] Rules: Make `recording_rules_range_interval` configurable for cases where Mimir metrics are scraped less often that every 30 seconds. #2118
 * [BUGFIX] Fix `container_memory_usage_bytes:sum` recording rule #1865
 * [BUGFIX] Fix `MimirGossipMembersMismatch` alerts if Mimir alertmanager is activated #1870
 * [BUGFIX] Fix `MimirRulerMissedEvaluations` to show % of missed alerts as a value between 0 and 100 instead of 0 and 1. #1895
@@ -53,15 +64,22 @@
 
 * [CHANGE] Remove use of `-querier.query-store-after`, `-querier.shuffle-sharding-ingesters-lookback-period`, `-blocks-storage.bucket-store.ignore-blocks-within`, and `-blocks-storage.tsdb.close-idle-tsdb-timeout` CLI flags since the values now match defaults. #1915 #1921
 * [CHANGE] Change default value for `-blocks-storage.bucket-store.chunks-cache.memcached.timeout` to `450ms` to increase use of cached data. #2035
+* [CHANGE] The `memberlist_ring_enabled` configuration now applies to Alertmanager. #2102
 * [FEATURE] Added querier autoscaling support. It requires [KEDA](https://keda.sh) installed in the Kubernetes cluster and query-scheduler enabled in the Mimir cluster. Querier autoscaler can be enabled and configure through the following options in the jsonnet config: #2013 #2023
   * `autoscaling_querier_enabled`: `true` to enable autoscaling.
   * `autoscaling_querier_min_replicas`: minimum number of querier replicas.
   * `autoscaling_querier_max_replicas`: maximum number of querier replicas.
   * `autoscaling_prometheus_url`: Prometheus base URL from which to scrape Mimir metrics (e.g. `http://prometheus.default:9090/prometheus`).
+* [ENHANCEMENT] Added `compactor` service, that can be used to route requests directly to compactor (e.g. admin UI). #2063
+* [ENHANCEMENT] Added a `consul_enabled` configuration option that defaults to true (matching previous behavior) to provide the ability to disable consul. #2093
 
 ### Mimirtool
 
 * [BUGFIX] mimirtool analyze: Fix dashboard JSON unmarshalling errors (#1840). #1973
+
+### Mimir Continuous Test
+
+* [ENHANCEMENT] Added the `-tests.smoke-test` flag to run the `mimir-continuous-test` suite once and immediately exit. #2047 #2094
 
 ### Documentation
 
@@ -70,6 +88,8 @@
 * [ENHANCEMENT] Recommend fast disks for ingesters and store-gateways in production tips. #1903
 * [ENHANCEMENT] Explain the runtime override of active series matchers. #1868
 * [ENHANCEMENT] Clarify "Set rule group" API specification. #1869
+* [BUGFIX] Fixed ruler configuration used in the getting started guide. #2052
+* [BUGFIX] Fixed Mimir Alertmanager datasource in Grafana used by "Play with Grafana Mimir" tutorial. #2115
 
 ## 2.1.0
 ### Grafana Mimir

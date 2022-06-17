@@ -92,6 +92,7 @@
 * [ENHANCEMENT] Explain the runtime override of active series matchers. #1868
 * [ENHANCEMENT] Clarify "Set rule group" API specification. #1869
 * [ENHANCEMENT] Published Mimir jsonnet documentation. #2024
+* [ENHANCEMENT] Documented how to configure queriers autoscaling with Jsonnet. #2128
 * [BUGFIX] Fixed ruler configuration used in the getting started guide. #2052
 * [BUGFIX] Fixed Mimir Alertmanager datasource in Grafana used by "Play with Grafana Mimir" tutorial. #2115
 
